@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@media print {
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  
+  @page {
+    size: A4;
+    margin: 20mm;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+
+  .print\:border-none {
+    border: none !important;
+  }
+
+  .print\:p-0 {
+    padding: 0 !important;
+  }
+
+  .print\:mt-16 {
+    margin-top: 4rem !important;
+  }
+}
