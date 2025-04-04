@@ -9,9 +9,6 @@ export default defineConfig({
   build: {
     sourcemap: true,
     rollupOptions: {
-      input: {
-        main: './index.html',
-      },
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom'],
