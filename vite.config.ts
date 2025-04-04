@@ -9,6 +9,7 @@ export default defineConfig({
   build: {
     sourcemap: true,
     rollupOptions: {
+      external: [],
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom'],
@@ -24,6 +25,11 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    host: true
+    host: true,
+    strictPort: false,
+    force: true,
+    hmr: {
+      timeout: 5000
+    }
   }
 });
