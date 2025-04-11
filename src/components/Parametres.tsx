@@ -1,67 +1,74 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Save, School, User, Calendar, Phone, Mail, MapPin } from 'lucide-react';
+import type { AppSettings } from '../hooks/useSettings';
 
 interface ParametresProps {
-  onSave: (settings: AppSettings) => void;
+  onSave: (settings: AppSettings) => boolean;
   initialSettings?: AppSettings;
 }
 
-interface AppSettings {
-  institut: {
-    nom: string;
-    adresse: string;
-    telephone: string;
-    email: string;
-    siteWeb?: string;
-    logo?: string;
-  };
-  anneeAcademique: {
-    debut: string;
-    fin: string;
-  };
-  directeurs: {
-    academique: {
-      nom: string;
-      titre: string;
-    };
-    general: {
-      nom: string;
-      titre: string;
-    };
-  };
-}
-
-const defaultSettings: AppSettings = {
-  institut: {
-    nom: "Institut Biblique de l'Alliance Chrétienne de Yamoussoukro",
-    adresse: "BP 63 Yamoussoukro - Côte d'Ivoire",
-    telephone: "(+225) 27 30 64 66 77",
-    email: "contact@ibacy.ci",
-    siteWeb: "www.ibacy.ci"
-  },
-  anneeAcademique: {
-    debut: "2024-09-01",
-    fin: "2025-07-31"
-  },
-  directeurs: {
-    academique: {
-      nom: "Dr. KOUASSI Yao",
-      titre: "Directeur Académique"
+export function Parametres({ onSave, initialSettings }: ParametresProps) {
+  const [settings, setSettings] = useState<AppSettings>(initialSettings || {
+    institut: {
+      nom: '',
+      adresse: '',
+      telephone: '',
+      email: '',
+      siteWeb: '',
     },
-    general: {
-      nom: "Rév. Dr. GUEHI Pokou",
-      titre: "Directeur Général"
-    }
-  }
-};
-
-export function Parametres({ onSave, initialSettings = defaultSettings }: ParametresProps) {
-  const [settings, setSettings] = useState<AppSettings>(initialSettings);
+    anneeAcademique: {
+      debut: '',
+      fin: '',
+    },
+    directeurs: {
+      academique: {
+        nom: '',
+        titre: '',
+      },
+      general: {
+        nom: '',
+        titre: '',
+      },
+    },
+  });
   const [activeTab, setActiveTab] = useState<'institut' | 'academique' | 'directeurs'>('institut');
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (initialSettings) {
+      setSettings(initialSettings);
+    }
+  }, [initialSettings]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(settings);
+    setSaveStatus('saving');
+    
+    try {
+      const success = onSave(settings);
+      setSaveStatus(success ? 'success' : 'error');
+      
+      // Reset status after 3 seconds
+      setTimeout(() => {
+        setSaveStatus('idle');
+      }, 3000);
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      setSaveStatus('error');
+    }
+  };
+
+  const getSaveButtonText = () => {
+    switch (saveStatus) {
+      case 'saving':
+        return 'Enregistrement...';
+      case 'success':
+        return 'Enregistré !';
+      case 'error':
+        return 'Erreur !';
+      default:
+        return 'Enregistrer les modifications';
+    }
   };
 
   return (
@@ -127,6 +134,7 @@ export function Parametres({ onSave, initialSettings = defaultSettings }: Parame
                     institut: { ...settings.institut, nom: e.target.value }
                   })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                  required
                 />
               </div>
 
@@ -146,6 +154,7 @@ export function Parametres({ onSave, initialSettings = defaultSettings }: Parame
                       institut: { ...settings.institut, adresse: e.target.value }
                     })}
                     className="flex-1 block w-full rounded-none rounded-r-md border-gray-300 focus:border-green-500 focus:ring-green-500"
+                    required
                   />
                 </div>
               </div>
@@ -166,6 +175,7 @@ export function Parametres({ onSave, initialSettings = defaultSettings }: Parame
                       institut: { ...settings.institut, telephone: e.target.value }
                     })}
                     className="flex-1 block w-full rounded-none rounded-r-md border-gray-300 focus:border-green-500 focus:ring-green-500"
+                    required
                   />
                 </div>
               </div>
@@ -186,6 +196,7 @@ export function Parametres({ onSave, initialSettings = defaultSettings }: Parame
                       institut: { ...settings.institut, email: e.target.value }
                     })}
                     className="flex-1 block w-full rounded-none rounded-r-md border-gray-300 focus:border-green-500 focus:ring-green-500"
+                    required
                   />
                 </div>
               </div>
@@ -222,6 +233,7 @@ export function Parametres({ onSave, initialSettings = defaultSettings }: Parame
                       anneeAcademique: { ...settings.anneeAcademique, debut: e.target.value }
                     })}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                    required
                   />
                 </div>
                 <div>
@@ -236,6 +248,7 @@ export function Parametres({ onSave, initialSettings = defaultSettings }: Parame
                       anneeAcademique: { ...settings.anneeAcademique, fin: e.target.value }
                     })}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                    required
                   />
                 </div>
               </div>
@@ -262,6 +275,7 @@ export function Parametres({ onSave, initialSettings = defaultSettings }: Parame
                         }
                       })}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                      required
                     />
                   </div>
                   <div>
@@ -279,6 +293,7 @@ export function Parametres({ onSave, initialSettings = defaultSettings }: Parame
                         }
                       })}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                      required
                     />
                   </div>
                 </div>
@@ -302,6 +317,7 @@ export function Parametres({ onSave, initialSettings = defaultSettings }: Parame
                         }
                       })}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                      required
                     />
                   </div>
                   <div>
@@ -319,6 +335,7 @@ export function Parametres({ onSave, initialSettings = defaultSettings }: Parame
                         }
                       })}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                      required
                     />
                   </div>
                 </div>
@@ -329,10 +346,19 @@ export function Parametres({ onSave, initialSettings = defaultSettings }: Parame
           <div className="mt-6 flex justify-end">
             <button
               type="submit"
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              disabled={saveStatus === 'saving'}
+              className={`inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+                saveStatus === 'saving'
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : saveStatus === 'success'
+                  ? 'bg-green-600'
+                  : saveStatus === 'error'
+                  ? 'bg-red-600'
+                  : 'bg-green-600 hover:bg-green-700'
+              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}
             >
               <Save className="w-4 h-4 mr-2" />
-              Enregistrer les modifications
+              {getSaveButtonText()}
             </button>
           </div>
         </form>
