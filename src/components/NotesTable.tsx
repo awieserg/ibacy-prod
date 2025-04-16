@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NoteForm } from './NoteForm';
 import { Plus, Pencil } from 'lucide-react';
 
@@ -14,6 +14,20 @@ export function NotesTable({ etudiant, cours, notes, onAddNote, onUpdateNote }: 
   const [showForm, setShowForm] = useState(false);
   const [selectedCours, setSelectedCours] = useState<string | null>(null);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
+  const [debug, setDebug] = useState<{ total: number; filtered: number }>({ total: 0, filtered: 0 });
+
+  // Effect to log debugging information
+  useEffect(() => {
+    const etudiantNotes = notes.filter(note => note.etudiant_id === etudiant.id);
+    console.log('NotesTable Debug:', {
+      etudiantId: etudiant.id,
+      totalNotes: notes.length,
+      filteredNotes: etudiantNotes.length,
+      notesData: etudiantNotes,
+      coursData: cours
+    });
+    setDebug({ total: notes.length, filtered: etudiantNotes.length });
+  }, [notes, etudiant.id, cours]);
 
   const etudiantNotes = notes.filter(note => note.etudiant_id === etudiant.id);
 
@@ -31,9 +45,14 @@ export function NotesTable({ etudiant, cours, notes, onAddNote, onUpdateNote }: 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium">
-          Notes de {etudiant.prenom} {etudiant.nom}
-        </h3>
+        <div>
+          <h3 className="text-lg font-medium">
+            Notes de {etudiant.prenom} {etudiant.nom}
+          </h3>
+          <p className="text-sm text-gray-500">
+            {debug.filtered} note(s) sur un total de {debug.total}
+          </p>
+        </div>
         <button
           onClick={() => {
             setEditingNote(null);
@@ -102,49 +121,54 @@ export function NotesTable({ etudiant, cours, notes, onAddNote, onUpdateNote }: 
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {etudiantNotes.map((note) => {
-                const coursInfo = cours.find(c => c.id === note.cours_id);
-                return (
-                  <tr key={note.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {coursInfo?.nom}
+              {etudiantNotes.length > 0 ? (
+                etudiantNotes.map((note) => {
+                  const coursInfo = cours.find(c => c.id === note.cours_id);
+                  if (!coursInfo) {
+                    console.warn(`Course not found for note: ${note.id}, cours_id: ${note.cours_id}`);
+                    return null;
+                  }
+                  return (
+                    <tr key={note.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {coursInfo.nom}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {coursInfo.matiere_nom}
+                          </div>
                         </div>
-                        <div className="text-sm text-gray-500">
-                          {coursInfo?.matiere_nom}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                        {note.valeur}/20
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {note.semestre === 1 ? '1er semestre' : '2ème semestre'}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {note.appreciation || '-'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button
-                        onClick={() => {
-                          setEditingNote(note);
-                          setShowForm(true);
-                        }}
-                        className="text-green-600 hover:text-green-900"
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-              {etudiantNotes.length === 0 && (
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                          {note.valeur}/20
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {note.semestre === 1 ? '1er semestre' : '2ème semestre'}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {note.appreciation || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button
+                          onClick={() => {
+                            setEditingNote(note);
+                            setShowForm(true);
+                          }}
+                          className="text-green-600 hover:text-green-900"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
                 <tr>
                   <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">
-                    Aucune note enregistrée
+                    Aucune note enregistrée pour cet étudiant
                   </td>
                 </tr>
               )}
