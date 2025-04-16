@@ -20,17 +20,33 @@ export function useSupabaseTable<T extends { id: string }>(tableName: string) {
       setLoading(true);
       setError(null);
       
-      const { data: result, error: fetchError } = await supabase
-        .from(tableName)
-        .select('*')
-        .order('created_at', { ascending: false });
+      let allData: T[] = [];
+      let page = 0;
+      const pageSize = 1000;
+      let hasMore = true;
 
-      if (fetchError) {
-        console.error(`Error fetching ${tableName}:`, fetchError);
-        throw new Error(`Erreur lors de la récupération des données: ${fetchError.message}`);
+      while (hasMore) {
+        const { data: result, error: fetchError } = await supabase
+          .from(tableName)
+          .select('*')
+          .range(page * pageSize, (page + 1) * pageSize - 1)
+          .order('created_at', { ascending: false });
+
+        if (fetchError) {
+          console.error(`Error fetching ${tableName}:`, fetchError);
+          throw new Error(`Erreur lors de la récupération des données: ${fetchError.message}`);
+        }
+
+        if (result) {
+          allData = [...allData, ...result];
+          hasMore = result.length === pageSize;
+          page++;
+        } else {
+          hasMore = false;
+        }
       }
 
-      setData(result as T[]);
+      setData(allData as T[]);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Une erreur est survenue';
       console.error(`Error in fetchData for ${tableName}:`, err);
