@@ -58,7 +58,8 @@ function App() {
     data: notes,
     loading: loadingNotes,
     insert: insertNote,
-    update: updateNote
+    update: updateNote,
+    remove: removeNote
   } = useNotes();
 
   // Si l'utilisateur n'est pas connecté, afficher le formulaire de connexion
@@ -137,6 +138,14 @@ function App() {
       await updateNote(id, updatedNote);
     } catch (error) {
       console.error('Erreur lors de la mise à jour de la note:', error);
+    }
+  };
+
+  const handleDeleteNote = async (id: string) => {
+    try {
+      await removeNote(id);
+    } catch (error) {
+      console.error('Erreur lors de la suppression de la note:', error);
     }
   };
 
@@ -335,6 +344,7 @@ function App() {
                   notes={notes}
                   onAddNote={handleAddNote}
                   onUpdateNote={handleUpdateNote}
+                  onDeleteNote={handleDeleteNote}
                 />
               </div>
             )}
