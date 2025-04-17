@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NoteForm } from './NoteForm';
-import { Plus, Pencil } from 'lucide-react';
+import { Plus, Pencil, Trash2 } from 'lucide-react';
 
 interface NotesTableProps {
   etudiant: Etudiant;
@@ -8,13 +8,15 @@ interface NotesTableProps {
   notes: Note[];
   onAddNote: (note: Omit<Note, "id">) => void;
   onUpdateNote: (id: string, note: Omit<Note, "id">) => void;
+  onDeleteNote: (id: string) => void;
 }
 
-export function NotesTable({ etudiant, cours, notes, onAddNote, onUpdateNote }: NotesTableProps) {
+export function NotesTable({ etudiant, cours, notes, onAddNote, onUpdateNote, onDeleteNote }: NotesTableProps) {
   const [showForm, setShowForm] = useState(false);
   const [selectedCours, setSelectedCours] = useState<string | null>(null);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [debug, setDebug] = useState<{ total: number; filtered: number }>({ total: 0, filtered: 0 });
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
 
   // Effect to log debugging information
   useEffect(() => {
@@ -40,6 +42,15 @@ export function NotesTable({ etudiant, cours, notes, onAddNote, onUpdateNote }: 
     setShowForm(false);
     setEditingNote(null);
     setSelectedCours(null);
+  };
+
+  const handleDelete = (noteId: string) => {
+    setShowDeleteConfirm(noteId);
+  };
+
+  const confirmDelete = (noteId: string) => {
+    onDeleteNote(noteId);
+    setShowDeleteConfirm(null);
   };
 
   return (
@@ -152,15 +163,25 @@ export function NotesTable({ etudiant, cours, notes, onAddNote, onUpdateNote }: 
                         {note.appreciation || '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button
-                          onClick={() => {
-                            setEditingNote(note);
-                            setShowForm(true);
-                          }}
-                          className="text-green-600 hover:text-green-900"
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </button>
+                        <div className="flex items-center justify-end space-x-2">
+                          <button
+                            onClick={() => {
+                              setEditingNote(note);
+                              setShowForm(true);
+                            }}
+                            className="text-green-600 hover:text-green-900"
+                            title="Modifier"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(note.id)}
+                            className="text-red-600 hover:text-red-900"
+                            title="Supprimer"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -174,6 +195,34 @@ export function NotesTable({ etudiant, cours, notes, onAddNote, onUpdateNote }: 
               )}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">
+              Confirmer la suppression
+            </h3>
+            <p className="text-sm text-gray-500 mb-6">
+              Êtes-vous sûr de vouloir supprimer cette note ? Cette action est irréversible.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setShowDeleteConfirm(null)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={() => confirmDelete(showDeleteConfirm)}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+              >
+                Supprimer
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
