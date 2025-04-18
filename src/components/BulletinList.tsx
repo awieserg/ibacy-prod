@@ -223,7 +223,7 @@ export function BulletinList({ etudiants, cours, enseignants, notes }: BulletinL
             <option value="all">Toutes les classes</option>
             <option value="1">1ère année</option>
             <option value="2">2ème année</option>
-            <option value="3">3ème année</option>
+            <option value="4">4ème année</option>
           </select>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
