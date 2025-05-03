@@ -4,28 +4,33 @@
 
 @media print {
   body {
-    print-color-adjust: exact;
+    font-family: Arial, sans-serif;
     -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
-  
+
   @page {
     size: A4;
     margin: 20mm;
   }
 
-  .print\:hidden {
+  .no-print {
     display: none !important;
   }
 
-  .print\:border-none {
-    border: none !important;
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
   }
 
-  .print\:p-0 {
-    padding: 0 !important;
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
   }
 
-  .print\:mt-16 {
-    margin-top: 4rem !important;
+  th {
+    background-color: #f8f9fa;
   }
 }
