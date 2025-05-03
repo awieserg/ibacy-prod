@@ -1,65 +1,31 @@
-/* Styles de base */
-body {
-  font-family: Arial, sans-serif;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-}
-
-th,
-td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-
-th {
-  background-color: #f8f9fa;
-  font-weight: bold;
-}
-
-.header {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.student-info {
-  margin-bottom: 20px;
-}
-
-.results {
-  margin-top: 30px;
-  padding: 15px;
-  background-color: #f8f9fa;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-}
-
-.appreciation {
-  font-style: italic;
-  color: #666;
-}
-
-/* Impression */
 @media print {
   body {
-    padding: 0;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  
+  @page {
+    size: A4;
+    margin: 20mm;
   }
 
-  .no-print {
+  .print\:hidden {
     display: none !important;
   }
 
-  table {
-    page-break-inside: avoid;
+  .print\:border-none {
+    border: none !important;
   }
 
-  .header,
-  .student-info,
-  .results {
-    page-break-inside: avoid;
+  .print\:p-0 {
+    padding: 0 !important;
+  }
+
+  .print\:mt-16 {
+    margin-top: 4rem !important;
   }
 }
