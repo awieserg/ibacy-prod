@@ -128,17 +128,21 @@ export function BulletinList({ etudiants, cours, enseignants, notes }: BulletinL
               <thead>
                 <tr>
                   <th>Cours</th>
+                  <th>Enseignant</th>
+                  <th>Coefficient</th>
                   <th>Moyenne/20</th>
                   <th>Appréciations</th>
                 </tr>
               </thead>
               <tbody>
-                ${semestre1Averages.map(({ coursInfo, moyenne, appreciations }) => `
+                ${semestre1Averages.map(({ coursInfo, moyenne, enseignant, appreciations }) => `
                   <tr>
                     <td>
                       ${coursInfo.nom}<br>
                       <small>(${coursInfo.matiere_nom})</small>
                     </td>
+                    <td>${enseignant ? `${enseignant.prenom} ${enseignant.nom}` : 'Non assigné'}</td>
+                    <td>${coursInfo.coefficient}</td>
                     <td>${moyenne}</td>
                     <td class="appreciation">${appreciations.length > 0 ? appreciations.join('; ') : '-'}</td>
                   </tr>
@@ -146,7 +150,7 @@ export function BulletinList({ etudiants, cours, enseignants, notes }: BulletinL
               </tbody>
               <tfoot>
                 <tr>
-                  <td style="text-align: right;"><strong>Moyenne du semestre:</strong></td>
+                  <td colspan="3" style="text-align: right;"><strong>Moyenne du semestre:</strong></td>
                   <td colspan="2"><strong>${moyenne1}/20</strong></td>
                 </tr>
               </tfoot>
@@ -157,17 +161,21 @@ export function BulletinList({ etudiants, cours, enseignants, notes }: BulletinL
               <thead>
                 <tr>
                   <th>Cours</th>
+                  <th>Enseignant</th>
+                  <th>Coefficient</th>
                   <th>Moyenne/20</th>
                   <th>Appréciations</th>
                 </tr>
               </thead>
               <tbody>
-                ${semestre2Averages.map(({ coursInfo, moyenne, appreciations }) => `
+                ${semestre2Averages.map(({ coursInfo, moyenne, enseignant, appreciations }) => `
                   <tr>
                     <td>
                       ${coursInfo.nom}<br>
                       <small>(${coursInfo.matiere_nom})</small>
                     </td>
+                    <td>${enseignant ? `${enseignant.prenom} ${enseignant.nom}` : 'Non assigné'}</td>
+                    <td>${coursInfo.coefficient}</td>
                     <td>${moyenne}</td>
                     <td class="appreciation">${appreciations.length > 0 ? appreciations.join('; ') : '-'}</td>
                   </tr>
@@ -175,7 +183,7 @@ export function BulletinList({ etudiants, cours, enseignants, notes }: BulletinL
               </tbody>
               <tfoot>
                 <tr>
-                  <td style="text-align: right;"><strong>Moyenne du semestre:</strong></td>
+                  <td colspan="3" style="text-align: right;"><strong>Moyenne du semestre:</strong></td>
                   <td colspan="2"><strong>${moyenne2}/20</strong></td>
                 </tr>
               </tfoot>
@@ -204,7 +212,100 @@ export function BulletinList({ etudiants, cours, enseignants, notes }: BulletinL
 
   return (
     <div className="space-y-6">
-      {/* Code principal de l'application */}
+      {/* Filtres et recherche */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <select
+            value={selectedClasse}
+            onChange={(e) => setSelectedClasse(e.target.value)}
+            className="rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+          >
+            <option value="all">Toutes les classes</option>
+            <option value="1">1ère année</option>
+            <option value="2">2ème année</option>
+            <option value="4">4ème année</option>
+          </select>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Rechercher un étudiant..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Liste des étudiants */}
+      <div className="bg-white shadow overflow-hidden sm:rounded-md">
+        <ul className="divide-y divide-gray-200">
+          {filteredEtudiants.map((etudiant) => (
+            <li key={etudiant.id}>
+              <div className="px-4 py-4 flex items-center justify-between sm:px-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+                      <span className="text-lg font-medium text-green-800">
+                        {etudiant.prenom[0]}{etudiant.nom[0]}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <h3 className="text-lg font-medium text-gray-900">
+                      {etudiant.prenom} {etudiant.nom}
+                    </h3>
+                    <div className="mt-1 text-sm text-gray-500">
+                      <span className="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">
+                        {etudiant.classe}ème année
+                      </span>
+                      {etudiant.date_naissance && (
+                        <span className="text-gray-500">
+                          {new Date(etudiant.date_naissance).toLocaleDateString()}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => setPreviewEtudiant(etudiant)}
+                    className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-[...]
+                  >
+                    <Eye className="w-4 h-4 mr-2" />
+                    Aperçu
+                  </button>
+                  <button
+                    onClick={() => handlePrint()}
+                    className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-[...]
+                  >
+                    <Printer className="w-4 h-4 mr-2" />
+                    Imprimer
+                  </button>
+                  <button
+                    onClick={() => handleDownload(etudiant)}
+                    className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 fo[...]
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Télécharger
+                  </button>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {previewEtudiant && (
+        <BulletinPreview
+          etudiant={previewEtudiant}
+          cours={cours}
+          notes={notes}
+          enseignants={enseignants}
+          onClose={() => setPreviewEtudiant(null)}
+        />
+      )}
     </div>
   );
 }
