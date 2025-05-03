@@ -161,8 +161,6 @@ export function BulletinList({ etudiants, cours, enseignants, notes }: BulletinL
               <thead>
                 <tr>
                   <th>Cours</th>
-                  <th>Enseignant</th>
-                  <th>Coefficient</th>
                   <th>Moyenne/20</th>
                   <th>Appréciations</th>
                 </tr>
@@ -174,8 +172,6 @@ export function BulletinList({ etudiants, cours, enseignants, notes }: BulletinL
                       ${coursInfo.nom}<br>
                       <small>(${coursInfo.matiere_nom})</small>
                     </td>
-                    <td>${enseignant ? `${enseignant.prenom} ${enseignant.nom}` : 'Non assigné'}</td>
-                    <td>${coursInfo.coefficient}</td>
                     <td>${moyenne}</td>
                     <td class="appreciation">${appreciations.length > 0 ? appreciations.join('; ') : '-'}</td>
                   </tr>
