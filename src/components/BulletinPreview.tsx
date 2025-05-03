@@ -17,6 +17,15 @@ export function BulletinPreview({ etudiant, cours, notes, enseignants, onClose }
   const [remarquesDirecteur, setRemarquesDirecteur] = useState('');
   const [settings] = useSettings();
 
+  // Vérification des paramètres
+  if (!etudiant || !cours || !notes) {
+    return <div>Aucune donnée disponible pour afficher le bulletin.</div>;
+  }
+
+  if (!settings || !settings.institut || !settings.anneeAcademique) {
+    return <div>Les paramètres de l'institut sont manquants.</div>;
+  }
+
   const coursAverages = useMemo(() => {
     const semestreActuel = bulletinType === 'semestre1' ? 1 : 2;
     const notesFiltered = notes.filter(note => note.semestre === semestreActuel);
@@ -94,14 +103,20 @@ export function BulletinPreview({ etudiant, cours, notes, enseignants, onClose }
           </tr>
         </thead>
         <tbody>
-          {coursAverages.map(cours => (
-            <tr key={cours.id}>
-              <td>{cours.nom}</td>
-              <td>{cours.coefficient}</td>
-              <td>{cours.moyenne}</td>
-              <td className="appreciation">{cours.appreciations[0]}</td>
+          {coursAverages.length > 0 ? (
+            coursAverages.map(cours => (
+              <tr key={cours.id}>
+                <td>{cours.nom}</td>
+                <td>{cours.coefficient}</td>
+                <td>{cours.moyenne}</td>
+                <td className="appreciation">{cours.appreciations[0]}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={4}>Aucune donnée disponible pour ce semestre.</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
       <button onClick={handlePrint}>Imprimer</button>
