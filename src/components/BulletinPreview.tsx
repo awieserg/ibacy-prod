@@ -381,8 +381,6 @@ export function BulletinPreview({ etudiant, cours, notes, enseignants, onClose }
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cours</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Enseignant</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Coef</th>
                 <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Moyenne/20</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Appréciation</th>
               </tr>
@@ -395,12 +393,6 @@ export function BulletinPreview({ etudiant, cours, notes, enseignants, onClose }
                       <div className="font-medium text-gray-900">{cours.nom}</div>
                       <div className="text-sm text-gray-500">({cours.matiere_nom})</div>
                     </div>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-500">
-                    {cours.enseignant}
-                  </td>
-                  <td className="px-4 py-3 text-center text-sm text-gray-500">
-                    {cours.coefficient}
                   </td>
                   <td className="px-4 py-3 text-center font-medium">
                     {cours.moyenne}
