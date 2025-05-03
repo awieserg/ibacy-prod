@@ -1,17 +1,52 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Styles de base */
+body {
+  font-family: Arial, sans-serif;
+}
 
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.student-info {
+  margin-bottom: 20px;
+}
+
+.results {
+  margin-top: 30px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.appreciation {
+  font-style: italic;
+  color: #666;
+}
+
+/* Impression */
 @media print {
   body {
-    font-family: Arial, sans-serif;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  @page {
-    size: A4;
-    margin: 20mm;
+    padding: 0;
   }
 
   .no-print {
@@ -19,18 +54,12 @@
   }
 
   table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
+    page-break-inside: avoid;
   }
 
-  th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-  }
-
-  th {
-    background-color: #f8f9fa;
+  .header,
+  .student-info,
+  .results {
+    page-break-inside: avoid;
   }
 }
