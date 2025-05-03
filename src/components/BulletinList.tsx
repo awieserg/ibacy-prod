@@ -14,9 +14,9 @@ export function BulletinList({ etudiants, cours, enseignants, notes }: BulletinL
   const [searchTerm, setSearchTerm] = useState('');
   const [previewEtudiant, setPreviewEtudiant] = useState<Etudiant | null>(null);
 
-  const filteredEtudiants = etudiants.filter(etudiant => {
+  const filteredEtudiants = etudiants.filter((etudiant) => {
     const matchesClasse = selectedClasse === 'all' || etudiant.classe === selectedClasse;
-    const matchesSearch = 
+    const matchesSearch =
       etudiant.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
       etudiant.prenom.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesClasse && matchesSearch;
@@ -27,39 +27,40 @@ export function BulletinList({ etudiants, cours, enseignants, notes }: BulletinL
   };
 
   const getCoursAverages = (etudiantId: string, semestre: number) => {
-    const etudiantNotes = notes.filter(note => 
-      note.etudiant_id === etudiantId && 
-      note.semestre === semestre
+    const etudiantNotes = notes.filter(
+      (note) => note.etudiant_id === etudiantId && note.semestre === semestre
     );
 
     // Grouper les notes par cours
     const notesByCours = etudiantNotes.reduce((acc, note) => {
-      const coursInfo = cours.find(c => c.id === note.cours_id);
+      const coursInfo = cours.find((c) => c.id === note.cours_id);
       if (!coursInfo) return acc;
 
       if (!acc[coursInfo.id]) {
         acc[coursInfo.id] = {
           notes: [],
-          coursInfo
+          coursInfo,
         };
       }
       acc[coursInfo.id].notes.push(note);
       return acc;
-    }, {} as Record<string, { notes: Note[], coursInfo: Cours }>);
+    }, {} as Record<string, { notes: Note[]; coursInfo: Cours }>);
 
     // Calculer la moyenne pour chaque cours
-    return Object.values(notesByCours).map(({ notes, coursInfo }) => {
-      const totalNotes = notes.reduce((sum, note) => sum + note.valeur, 0);
-      const moyenne = notes.length > 0 ? +(totalNotes / notes.length).toFixed(2) : 0;
-      const enseignant = enseignants.find(e => e.id === coursInfo.enseignant_id);
+    return Object.values(notesByCours)
+      .map(({ notes, coursInfo }) => {
+        const totalNotes = notes.reduce((sum, note) => sum + note.valeur, 0);
+        const moyenne = notes.length > 0 ? +(totalNotes / notes.length).toFixed(2) : 0;
+        const enseignant = enseignants.find((e) => e.id === coursInfo.enseignant_id);
 
-      return {
-        coursInfo,
-        moyenne,
-        enseignant,
-        appreciations: notes.map(note => note.appreciation).filter(Boolean)
-      };
-    }).sort((a, b) => a.coursInfo.matiere_nom.localeCompare(b.coursInfo.matiere_nom));
+        return {
+          coursInfo,
+          moyenne,
+          enseignant,
+          appreciations: notes.map((note) => note.appreciation).filter(Boolean),
+        };
+      })
+      .sort((a, b) => a.coursInfo.matiere_nom.localeCompare(b.coursInfo.matiere_nom));
   };
 
   const calculerMoyenneGenerale = (coursAverages: ReturnType<typeof getCoursAverages>) => {
@@ -135,7 +136,9 @@ export function BulletinList({ etudiants, cours, enseignants, notes }: BulletinL
                 </tr>
               </thead>
               <tbody>
-                ${semestre1Averages.map(({ coursInfo, moyenne, enseignant, appreciations }) => `
+                ${semestre1Averages
+                  .map(
+                    ({ coursInfo, moyenne, enseignant, appreciations }) => `
                   <tr>
                     <td>
                       ${coursInfo.nom}<br>
@@ -144,9 +147,13 @@ export function BulletinList({ etudiants, cours, enseignants, notes }: BulletinL
                     <td>${enseignant ? `${enseignant.prenom} ${enseignant.nom}` : 'Non assigné'}</td>
                     <td>${coursInfo.coefficient}</td>
                     <td>${moyenne}</td>
-                    <td class="appreciation">${appreciations.length > 0 ? appreciations.join('; ') : '-'}</td>
+                    <td class="appreciation">${
+                      appreciations.length > 0 ? appreciations.join('; ') : '-'
+                    }</td>
                   </tr>
-                `).join('')}
+                `
+                  )
+                  .join('')}
               </tbody>
               <tfoot>
                 <tr>
@@ -168,7 +175,9 @@ export function BulletinList({ etudiants, cours, enseignants, notes }: BulletinL
                 </tr>
               </thead>
               <tbody>
-                ${semestre2Averages.map(({ coursInfo, moyenne, enseignant, appreciations }) => `
+                ${semestre2Averages
+                  .map(
+                    ({ coursInfo, moyenne, enseignant, appreciations }) => `
                   <tr>
                     <td>
                       ${coursInfo.nom}<br>
@@ -177,9 +186,13 @@ export function BulletinList({ etudiants, cours, enseignants, notes }: BulletinL
                     <td>${enseignant ? `${enseignant.prenom} ${enseignant.nom}` : 'Non assigné'}</td>
                     <td>${coursInfo.coefficient}</td>
                     <td>${moyenne}</td>
-                    <td class="appreciation">${appreciations.length > 0 ? appreciations.join('; ') : '-'}</td>
+                    <td class="appreciation">${
+                      appreciations.length > 0 ? appreciations.join('; ') : '-'
+                    }</td>
                   </tr>
-                `).join('')}
+                `
+                  )
+                  .join('')}
               </tbody>
               <tfoot>
                 <tr>
@@ -248,7 +261,8 @@ export function BulletinList({ etudiants, cours, enseignants, notes }: BulletinL
                   <div className="flex-shrink-0">
                     <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
                       <span className="text-lg font-medium text-green-800">
-                        {etudiant.prenom[0]}{etudiant.nom[0]}
+                        {etudiant.prenom[0]}
+                        {etudiant.nom[0]}
                       </span>
                     </div>
                   </div>
@@ -271,21 +285,21 @@ export function BulletinList({ etudiants, cours, enseignants, notes }: BulletinL
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => setPreviewEtudiant(etudiant)}
-                    className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-[...]
+                    className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                   >
                     <Eye className="w-4 h-4 mr-2" />
                     Aperçu
                   </button>
                   <button
-                    onClick={() => handlePrint()}
-                    className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-[...]
+                    onClick={handlePrint}
+                    className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                   >
                     <Printer className="w-4 h-4 mr-2" />
                     Imprimer
                   </button>
                   <button
                     onClick={() => handleDownload(etudiant)}
-                    className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 fo[...]
+                    className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                   >
                     <Download className="w-4 h-4 mr-2" />
                     Télécharger
