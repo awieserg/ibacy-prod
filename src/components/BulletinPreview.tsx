@@ -30,6 +30,33 @@ export function BulletinPreview({ etudiant, cours, notes, enseignants, onClose, 
 
   const etudiantNotes = notes.filter(note => note.etudiant_id === etudiant.id);
 
+  // Calculer les moyennes par semestre
+  const moyennesParSemestre = useMemo(() => {
+    const moyennes = {
+      semestre1: 0,
+      semestre2: 0,
+      annuelle: 0
+    };
+
+    const notesS1 = etudiantNotes.filter(note => note.semestre === 1);
+    const notesS2 = etudiantNotes.filter(note => note.semestre === 2);
+
+    if (notesS1.length > 0) {
+      moyennes.semestre1 = +(notesS1.reduce((sum, note) => sum + note.valeur, 0) / notesS1.length).toFixed(2);
+    }
+
+    if (notesS2.length > 0) {
+      moyennes.semestre2 = +(notesS2.reduce((sum, note) => sum + note.valeur, 0) / notesS2.length).toFixed(2);
+    }
+
+    if (moyennes.semestre1 > 0 || moyennes.semestre2 > 0) {
+      const diviseur = (moyennes.semestre1 > 0 ? 1 : 0) + (moyennes.semestre2 > 0 ? 1 : 0);
+      moyennes.annuelle = +((moyennes.semestre1 + moyennes.semestre2) / diviseur).toFixed(2);
+    }
+
+    return moyennes;
+  }, [etudiantNotes]);
+
   const coursParMatiere = useMemo(() => {
     const semestreActuel = bulletinType === 'semestre1' ? 1 : 2;
     const notesFiltered = etudiantNotes.filter(note => {
@@ -151,7 +178,7 @@ export function BulletinPreview({ etudiant, cours, notes, enseignants, onClose, 
           <tfoot className="bg-gray-50">
             <tr>
               <td colSpan={2} className="px-4 py-3 text-right font-medium">
-                {bulletinType === 'final' ? 'Moyenne finale:' : 'Moyenne du semestre:'}
+                Moyenne du semestre:
               </td>
               <td className="px-4 py-3 text-center font-bold">
                 {moyenneGenerale}/20
@@ -160,6 +187,32 @@ export function BulletinPreview({ etudiant, cours, notes, enseignants, onClose, 
                 {getAppreciationFromGrade(moyenneGenerale)}
               </td>
             </tr>
+            {bulletinType === 'semestre2' && (
+              <>
+                <tr>
+                  <td colSpan={2} className="px-4 py-3 text-right font-medium">
+                    Moyenne du 1er semestre:
+                  </td>
+                  <td className="px-4 py-3 text-center font-bold">
+                    {moyennesParSemestre.semestre1}/20
+                  </td>
+                  <td className="px-4 py-3 font-medium text-gray-700">
+                    {getAppreciationFromGrade(moyennesParSemestre.semestre1)}
+                  </td>
+                </tr>
+                <tr className="bg-green-50">
+                  <td colSpan={2} className="px-4 py-3 text-right font-bold">
+                    Moyenne annuelle:
+                  </td>
+                  <td className="px-4 py-3 text-center font-bold text-green-700">
+                    {moyennesParSemestre.annuelle}/20
+                  </td>
+                  <td className="px-4 py-3 font-bold text-green-700">
+                    {getAppreciationFromGrade(moyennesParSemestre.annuelle)}
+                  </td>
+                </tr>
+              </>
+            )}
           </tfoot>
         </table>
       </div>
