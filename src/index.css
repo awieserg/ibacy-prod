@@ -3,29 +3,177 @@
 @tailwind utilities;
 
 @media print {
+  /* Styles de base pour l'impression */
   body {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
+    background: white !important;
+    margin: 0;
+    padding: 0;
   }
   
   @page {
     size: A4;
-    margin: 20mm;
+    margin: 10mm;
   }
 
+  /* Styles spécifiques pour le logo */
+  .logo-print {
+    height: 80px !important;
+    width: auto !important;
+    object-fit: contain !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Autres styles d'impression existants */
   .print\:hidden {
     display: none !important;
-  }
-
-  .print\:border-none {
-    border: none !important;
   }
 
   .print\:p-0 {
     padding: 0 !important;
   }
 
-  .print\:mt-16 {
-    margin-top: 4rem !important;
+  .print\:m-0 {
+    margin: 0 !important;
+  }
+
+  .print\:shadow-none {
+    box-shadow: none !important;
+  }
+
+  .print\:bg-white {
+    background-color: white !important;
+  }
+
+  .print\:border-none {
+    border: none !important;
+  }
+
+  .bg-green-50,
+  .bg-green-100,
+  .bg-green-600,
+  .text-green-600,
+  .text-red-600 {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  table {
+    page-break-inside: avoid;
+    font-size: 11pt;
+    line-height: 1.1;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+
+  td, th {
+    padding-top: 2pt !important;
+    padding-bottom: 2pt !important;
+    padding-left: 4pt !important;
+    padding-right: 4pt !important;
+  }
+
+  .max-h-\[90vh\] {
+    max-height: none !important;
+  }
+
+  .overflow-y-auto {
+    overflow: visible !important;
+  }
+
+  .shadow-xl,
+  .shadow-lg,
+  .shadow-md,
+  .shadow-sm {
+    box-shadow: none !important;
+  }
+
+  .border-gray-200 {
+    border-color: #e5e7eb !important;
+  }
+
+  h2 {
+    font-size: 14pt !important;
+    margin-bottom: 3pt !important;
+  }
+
+  h3 {
+    font-size: 12pt !important;
+    margin: 6pt 0 !important;
+  }
+
+  .mb-8 {
+    margin-bottom: 8pt !important;
+  }
+
+  .mb-6 {
+    margin-bottom: 6pt !important;
+  }
+
+  .py-4 {
+    padding-top: 4pt !important;
+    padding-bottom: 4pt !important;
+  }
+
+  .p-4 {
+    padding: 4pt !important;
+  }
+
+  .px-4 {
+    padding-left: 4pt !important;
+    padding-right: 4pt !important;
+  }
+
+  .py-3 {
+    padding-top: 2pt !important;
+    padding-bottom: 2pt !important;
+  }
+
+  tbody td {
+    font-size: 11pt !important;
+  }
+
+  tfoot td, 
+  td.text-center.font-medium,
+  .font-medium.text-gray-900 {
+    font-size: 12pt !important;
+    font-weight: 600 !important;
+  }
+
+  .text-sm {
+    font-size: 8pt !important;
+  }
+
+  .text-xs {
+    font-size: 7pt !important;
+  }
+
+  .text-lg {
+    font-size: 11pt !important;
+  }
+
+  .text-xl {
+    font-size: 12pt !important;
+  }
+
+  .text-2xl {
+    font-size: 14pt !important;
+  }
+
+  .page-break-before-always {
+    page-break-before: always;
+  }
+
+  .hidden-print {
+    display: none !important;
+  }
+
+  .print-bulletin {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
   }
 }
