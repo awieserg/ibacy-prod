@@ -217,26 +217,26 @@ export function BulletinPreview({ etudiant, cours, notes, enseignants, onClose, 
         </table>
       </div>
 
-      <div className="mb-4">
-        <h4 className="text-lg font-medium mb-3">CONDUITE</h4>
+      <div className="mb-2">
+        <h4 className="text-sm font-medium mb-1">CONDUITE</h4>
         <textarea
           value={remarquesConduite}
           onChange={(e) => setRemarquesConduite(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-md"
+          className="w-full p-2 border border-gray-300 rounded-md text-sm"
           rows={1}
           placeholder=".../20   Commentaire:....."
           readOnly={printMode}
         />
       </div>
 
-      <div className="mb-8">
-        <h4 className="text-lg font-medium mb-3">Remarques du {settings.directeurs.academique.titre}</h4>
+      <div className="mb-4">
+        <h4 className="text-sm font-medium mb-1">Remarques du {settings.directeurs.academique.titre}</h4>
         <textarea
           value={remarquesDirecteur}
           onChange={(e) => setRemarquesDirecteur(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-md"
-          rows={2}
-          placeholder="Ajouter des remarques..."
+          className="w-full p-2 border border-gray-300 rounded-md text-sm"
+          rows={1}
+          placeholder="..."
           readOnly={printMode}
         />
       </div>
@@ -245,14 +245,10 @@ export function BulletinPreview({ etudiant, cours, notes, enseignants, onClose, 
         <div className="text-center">
           <p className="font-medium">{settings.directeurs.academique.titre}</p>
           <p className="mt-1">{settings.directeurs.academique.nom}</p>
-          <div className="mt-8 h-12 border-b border-gray-300">
-          </div>
         </div>
         <div className="text-center">
           <p className="font-medium">{settings.directeurs.general.titre}</p>
           <p className="mt-1">{settings.directeurs.general.nom}</p>
-          <div className="mt-8 h-12 border-b border-gray-300">
-          </div>
         </div>
       </div>
     </div>
