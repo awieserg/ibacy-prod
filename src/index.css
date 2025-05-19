@@ -19,11 +19,36 @@
 
   /* Styles spécifiques pour le logo */
   .logo-print {
-    height: 80px !important;
+    height: 120px !important;
     width: auto !important;
     object-fit: contain !important;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
+  }
+
+  /* Styles spécifiques pour le tableau */
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    margin-bottom: 1rem !important;
+  }
+
+  th, td {
+    border: 1px solid #e5e7eb !important;
+    padding: 0.5rem !important;
+  }
+
+  thead th {
+    background-color: #f9fafb !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    font-size: 0.75rem !important;
+    line-height: 1rem !important;
+  }
+
+  tfoot td {
+    font-weight: 700 !important;
+    background-color: #f9fafb !important;
   }
 
   /* Autres styles d'impression existants */
