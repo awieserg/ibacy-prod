@@ -97,13 +97,22 @@ export function Dashboard({ etudiants, enseignants, cours, notes }: DashboardPro
   const etudiantsParClasse = getEtudiantsParClasse();
   const meilleursEtudiants = getMeilleursEtudiants();
 
+  // Get the current academic year or fallback to current year
+  const currentYear = new Date().getFullYear();
+  const academicYearStart = settings?.anneeAcademique?.debut 
+    ? new Date(settings.anneeAcademique.debut).getFullYear() 
+    : currentYear;
+  const academicYearEnd = settings?.anneeAcademique?.fin 
+    ? new Date(settings.anneeAcademique.fin).getFullYear() 
+    : currentYear + 1;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold">Tableau de Bord</h2>
           <p className="mt-1 text-sm text-gray-500">
-            Année Académique {new Date(settings.anneeAcademique.debut).getFullYear()}-{new Date(settings.anneeAcademique.fin).getFullYear()}
+            Année Académique {academicYearStart}-{academicYearEnd}
           </p>
         </div>
         <div className="text-right">
