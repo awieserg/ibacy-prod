@@ -6,6 +6,14 @@ import { getAppreciationFromGrade } from '../utils/gradeUtils';
 import { useReactToPrint } from 'react-to-print';
 import logo from '../assets/Logo.png';
 
+const MATIERE_ORDER = [
+  'Ancien Testament',
+  'Nouveau Testament',
+  'Théologie Pratique',
+  'Histoire et Théologie',
+  'Sciences Humaines'
+];
+
 interface BulletinPreviewProps {
   etudiant: Etudiant;
   cours: Cours[];
@@ -19,7 +27,7 @@ export function BulletinPreview({ etudiant, cours, notes, enseignants, onClose, 
   const [bulletinType, setBulletinType] = useState<BulletinType>('semestre1');
   const [remarquesDirecteur, setRemarquesDirecteur] = useState('');
   const [remarquesConduite, setRemarquesConduite] = useState('');
-  const [settings] = useSettings();
+  const [settings, _, loading] = useSettings();
   const componentRef = useRef(null);
 
   const handlePrint = useReactToPrint({
@@ -87,7 +95,25 @@ export function BulletinPreview({ etudiant, cours, notes, enseignants, onClose, 
       }
     });
 
-    return Array.from(matieres.values()).filter(matiere => matiere.cours.length > 0);
+    // Convertir la Map en tableau et trier selon l'ordre défini
+    return Array.from(matieres.values())
+      .filter(matiere => matiere.cours.length > 0)
+      .sort((a, b) => {
+        const indexA = MATIERE_ORDER.indexOf(a.nom);
+        const indexB = MATIERE_ORDER.indexOf(b.nom);
+        
+        // Si les deux matières ne sont pas dans l'ordre défini, les trier alphabétiquement
+        if (indexA === -1 && indexB === -1) {
+          return a.nom.localeCompare(b.nom);
+        }
+        
+        // Si une matière est dans l'ordre défini et l'autre non
+        if (indexA === -1) return 1;
+        if (indexB === -1) return -1;
+        
+        // Si les deux matières sont dans l'ordre défini
+        return indexA - indexB;
+      });
   }, [etudiantNotes, cours, bulletinType]);
 
   const moyenneGenerale = useMemo(() => {
@@ -98,19 +124,34 @@ export function BulletinPreview({ etudiant, cours, notes, enseignants, onClose, 
   }, [coursParMatiere]);
 
   const getAnneeAcademique = () => {
-    const debut = new Date(settings.anneeAcademique.debut);
-    const fin = new Date(settings.anneeAcademique.fin);
-    return `${debut.getFullYear()}-${fin.getFullYear()}`;
+    const currentYear = new Date().getFullYear();
+    const debut = settings?.annee_academique_debut 
+      ? new Date(settings.annee_academique_debut).getFullYear()
+      : currentYear;
+    const fin = settings?.annee_academique_fin
+      ? new Date(settings.annee_academique_fin).getFullYear()
+      : currentYear + 1;
+    return `${debut}-${fin}`;
   };
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-lg shadow-xl p-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+        </div>
+      </div>
+    );
+  }
 
   const content = (
     <div ref={componentRef}>
       <div className="mb-8">
         <div className="flex items-center justify-between">
-          <img src={logo} alt="Logo IBACY" className="logo-print h-24 w-auto object-contain" />
+          <img src={logo} alt="Logo IBACY" className="logo-print h-32 w-auto object-contain" />
           <div className="flex-1 text-center">
-            <h2 className="text-2xl font-bold text-green-700">{settings.institut.nom}</h2>
-            <p className="text-gray-600 mt-2">{settings.institut.adresse} | Tél: {settings.institut.telephone}</p>
+            <h2 className="text-2xl font-bold text-green-700">{settings.institut_nom}</h2>
+            <p className="text-gray-600 mt-2">{settings.institut_adresse} | Tél: {settings.institut_telephone}</p>
             <h3 className="text-xl font-bold mt-4">
               {bulletinType === 'final' 
                 ? 'RELEVÉ DE NOTES - EXAMEN FINAL'
@@ -139,10 +180,10 @@ export function BulletinPreview({ etudiant, cours, notes, enseignants, onClose, 
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-1/4">Matières</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-1/4">Cours</th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase w-1/4">Moyenne/20</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-1/4">Appréciation</th>
+              <th className="px-4 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">Matières</th>
+              <th className="px-4 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">Cours</th>
+              <th className="px-4 py-3 text-center text-xs font-bold text-gray-900 uppercase tracking-wider">Moyenne/20</th>
+              <th className="px-4 py-3 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">Appréciation</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -177,31 +218,31 @@ export function BulletinPreview({ etudiant, cours, notes, enseignants, onClose, 
           </tbody>
           <tfoot className="bg-gray-50">
             <tr>
-              <td colSpan={2} className="px-4 py-3 text-right font-medium">
+              <td colSpan={2} className="px-4 py-3 text-right font-bold text-gray-900">
                 Moyenne du semestre:
               </td>
-              <td className="px-4 py-3 text-center font-bold">
+              <td className="px-4 py-3 text-center font-bold text-gray-900">
                 {moyenneGenerale}/20
               </td>
-              <td className="px-4 py-3 font-medium text-gray-700">
+              <td className="px-4 py-3 font-bold text-gray-900">
                 {getAppreciationFromGrade(moyenneGenerale)}
               </td>
             </tr>
             {bulletinType === 'semestre2' && (
               <>
                 <tr>
-                  <td colSpan={2} className="px-4 py-3 text-right font-medium">
+                  <td colSpan={2} className="px-4 py-3 text-right font-bold text-gray-900">
                     Moyenne du 1er semestre:
                   </td>
-                  <td className="px-4 py-3 text-center font-bold">
+                  <td className="px-4 py-3 text-center font-bold text-gray-900">
                     {moyennesParSemestre.semestre1}/20
                   </td>
-                  <td className="px-4 py-3 font-medium text-gray-700">
+                  <td className="px-4 py-3 font-bold text-gray-900">
                     {getAppreciationFromGrade(moyennesParSemestre.semestre1)}
                   </td>
                 </tr>
                 <tr className="bg-green-50">
-                  <td colSpan={2} className="px-4 py-3 text-right font-bold">
+                  <td colSpan={2} className="px-4 py-3 text-right font-bold text-green-700">
                     Moyenne annuelle:
                   </td>
                   <td className="px-4 py-3 text-center font-bold text-green-700">
@@ -230,7 +271,7 @@ export function BulletinPreview({ etudiant, cours, notes, enseignants, onClose, 
       </div>
 
       <div className="mb-4">
-        <h4 className="text-sm font-medium mb-1">Remarques du {settings.directeurs.academique.titre}</h4>
+        <h4 className="text-sm font-medium mb-1">Remarques du {settings.directeur_academique_titre}</h4>
         <textarea
           value={remarquesDirecteur}
           onChange={(e) => setRemarquesDirecteur(e.target.value)}
@@ -243,12 +284,12 @@ export function BulletinPreview({ etudiant, cours, notes, enseignants, onClose, 
 
       <div className="grid grid-cols-2 gap-8 mt-8">
         <div className="text-center">
-          <p className="font-medium">{settings.directeurs.academique.titre}</p>
-          <p className="mt-1">{settings.directeurs.academique.nom}</p>
+          <p className="font-medium">{settings.directeur_academique_titre}</p>
+          <p className="mt-1">{settings.directeur_academique_nom}</p>
         </div>
         <div className="text-center">
-          <p className="font-medium">{settings.directeurs.general.titre}</p>
-          <p className="mt-1">{settings.directeurs.general.nom}</p>
+          <p className="font-medium">{settings.directeur_general_titre}</p>
+          <p className="mt-1">{settings.directeur_general_nom}</p>
         </div>
       </div>
     </div>
