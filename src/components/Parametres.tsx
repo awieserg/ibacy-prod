@@ -1,54 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Save, School, User, Calendar, Phone, Mail, MapPin } from 'lucide-react';
-import type { AppSettings } from '../hooks/useSettings';
+import { useSettings } from '../hooks/useSettings';
+import type { Database } from '../types/database.types';
+
+type Settings = Database['public']['Tables']['settings']['Row'];
 
 interface ParametresProps {
-  onSave: (settings: AppSettings) => boolean;
-  initialSettings?: AppSettings;
+  onClose?: () => void;
 }
 
-export function Parametres({ onSave, initialSettings }: ParametresProps) {
-  const [settings, setSettings] = useState<AppSettings>(initialSettings || {
-    institut: {
-      nom: '',
-      adresse: '',
-      telephone: '',
-      email: '',
-      siteWeb: '',
-    },
-    anneeAcademique: {
-      debut: '',
-      fin: '',
-    },
-    directeurs: {
-      academique: {
-        nom: '',
-        titre: '',
-      },
-      general: {
-        nom: '',
-        titre: '',
-      },
-    },
+export function Parametres({ onClose }: ParametresProps) {
+  const [settings, updateSettings, loading] = useSettings();
+  const [formData, setFormData] = useState<Omit<Settings, 'id' | 'updated_at'>>({
+    institut_nom: settings.institut_nom,
+    institut_adresse: settings.institut_adresse,
+    institut_telephone: settings.institut_telephone,
+    institut_email: settings.institut_email,
+    institut_site_web: settings.institut_site_web,
+    annee_academique_debut: settings.annee_academique_debut,
+    annee_academique_fin: settings.annee_academique_fin,
+    directeur_academique_nom: settings.directeur_academique_nom,
+    directeur_academique_titre: settings.directeur_academique_titre,
+    directeur_general_nom: settings.directeur_general_nom,
+    directeur_general_titre: settings.directeur_general_titre
   });
   const [activeTab, setActiveTab] = useState<'institut' | 'academique' | 'directeurs'>('institut');
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
-
-  useEffect(() => {
-    if (initialSettings) {
-      setSettings(initialSettings);
-    }
-  }, [initialSettings]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaveStatus('saving');
     
     try {
-      const success = onSave(settings);
+      const success = await updateSettings(formData);
       setSaveStatus(success ? 'success' : 'error');
       
-      // Reset status after 3 seconds
       setTimeout(() => {
         setSaveStatus('idle');
       }, 3000);
@@ -57,6 +43,14 @@ export function Parametres({ onSave, initialSettings }: ParametresProps) {
       setSaveStatus('error');
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+      </div>
+    );
+  }
 
   const getSaveButtonText = () => {
     switch (saveStatus) {
@@ -128,10 +122,10 @@ export function Parametres({ onSave, initialSettings }: ParametresProps) {
                 </label>
                 <input
                   type="text"
-                  value={settings.institut.nom}
-                  onChange={(e) => setSettings({
-                    ...settings,
-                    institut: { ...settings.institut, nom: e.target.value }
+                  value={formData.institut_nom}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    institut_nom: e.target.value
                   })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                   required
@@ -148,10 +142,10 @@ export function Parametres({ onSave, initialSettings }: ParametresProps) {
                   </span>
                   <input
                     type="text"
-                    value={settings.institut.adresse}
-                    onChange={(e) => setSettings({
-                      ...settings,
-                      institut: { ...settings.institut, adresse: e.target.value }
+                    value={formData.institut_adresse}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      institut_adresse: e.target.value
                     })}
                     className="flex-1 block w-full rounded-none rounded-r-md border-gray-300 focus:border-green-500 focus:ring-green-500"
                     required
@@ -169,10 +163,10 @@ export function Parametres({ onSave, initialSettings }: ParametresProps) {
                   </span>
                   <input
                     type="tel"
-                    value={settings.institut.telephone}
-                    onChange={(e) => setSettings({
-                      ...settings,
-                      institut: { ...settings.institut, telephone: e.target.value }
+                    value={formData.institut_telephone}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      institut_telephone: e.target.value
                     })}
                     className="flex-1 block w-full rounded-none rounded-r-md border-gray-300 focus:border-green-500 focus:ring-green-500"
                     required
@@ -190,10 +184,10 @@ export function Parametres({ onSave, initialSettings }: ParametresProps) {
                   </span>
                   <input
                     type="email"
-                    value={settings.institut.email}
-                    onChange={(e) => setSettings({
-                      ...settings,
-                      institut: { ...settings.institut, email: e.target.value }
+                    value={formData.institut_email}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      institut_email: e.target.value
                     })}
                     className="flex-1 block w-full rounded-none rounded-r-md border-gray-300 focus:border-green-500 focus:ring-green-500"
                     required
@@ -207,10 +201,10 @@ export function Parametres({ onSave, initialSettings }: ParametresProps) {
                 </label>
                 <input
                   type="url"
-                  value={settings.institut.siteWeb}
-                  onChange={(e) => setSettings({
-                    ...settings,
-                    institut: { ...settings.institut, siteWeb: e.target.value }
+                  value={formData.institut_site_web || ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    institut_site_web: e.target.value
                   })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                 />
@@ -227,10 +221,10 @@ export function Parametres({ onSave, initialSettings }: ParametresProps) {
                   </label>
                   <input
                     type="date"
-                    value={settings.anneeAcademique.debut}
-                    onChange={(e) => setSettings({
-                      ...settings,
-                      anneeAcademique: { ...settings.anneeAcademique, debut: e.target.value }
+                    value={formData.annee_academique_debut}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      annee_academique_debut: e.target.value
                     })}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                     required
@@ -242,10 +236,10 @@ export function Parametres({ onSave, initialSettings }: ParametresProps) {
                   </label>
                   <input
                     type="date"
-                    value={settings.anneeAcademique.fin}
-                    onChange={(e) => setSettings({
-                      ...settings,
-                      anneeAcademique: { ...settings.anneeAcademique, fin: e.target.value }
+                    value={formData.annee_academique_fin}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      annee_academique_fin: e.target.value
                     })}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                     required
@@ -266,13 +260,10 @@ export function Parametres({ onSave, initialSettings }: ParametresProps) {
                     </label>
                     <input
                       type="text"
-                      value={settings.directeurs.academique.nom}
-                      onChange={(e) => setSettings({
-                        ...settings,
-                        directeurs: {
-                          ...settings.directeurs,
-                          academique: { ...settings.directeurs.academique, nom: e.target.value }
-                        }
+                      value={formData.directeur_academique_nom}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        directeur_academique_nom: e.target.value
                       })}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                       required
@@ -284,13 +275,10 @@ export function Parametres({ onSave, initialSettings }: ParametresProps) {
                     </label>
                     <input
                       type="text"
-                      value={settings.directeurs.academique.titre}
-                      onChange={(e) => setSettings({
-                        ...settings,
-                        directeurs: {
-                          ...settings.directeurs,
-                          academique: { ...settings.directeurs.academique, titre: e.target.value }
-                        }
+                      value={formData.directeur_academique_titre}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        directeur_academique_titre: e.target.value
                       })}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                       required
@@ -308,13 +296,10 @@ export function Parametres({ onSave, initialSettings }: ParametresProps) {
                     </label>
                     <input
                       type="text"
-                      value={settings.directeurs.general.nom}
-                      onChange={(e) => setSettings({
-                        ...settings,
-                        directeurs: {
-                          ...settings.directeurs,
-                          general: { ...settings.directeurs.general, nom: e.target.value }
-                        }
+                      value={formData.directeur_general_nom}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        directeur_general_nom: e.target.value
                       })}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                       required
@@ -326,13 +311,10 @@ export function Parametres({ onSave, initialSettings }: ParametresProps) {
                     </label>
                     <input
                       type="text"
-                      value={settings.directeurs.general.titre}
-                      onChange={(e) => setSettings({
-                        ...settings,
-                        directeurs: {
-                          ...settings.directeurs,
-                          general: { ...settings.directeurs.general, titre: e.target.value }
-                        }
+                      value={formData.directeur_general_titre}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        directeur_general_titre: e.target.value
                       })}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                       required
